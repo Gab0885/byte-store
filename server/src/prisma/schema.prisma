@@ -1,0 +1,72 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           Int        @id @default(autoincrement())
+  name         String     @db.VarChar(200)
+  email        String     @unique @db.VarChar(255)
+  passwordHash String     @db.VarChar(255)
+  CartItem     CartItem[]
+  Order        Order[]
+}
+
+model Product {
+  id          Int         @id @default(autoincrement())
+  name        String      @db.VarChar(255)
+  category    String      @db.VarChar(255)
+  description String      @db.Text
+  quantity    Int         @db.Integer
+  price       Decimal     @db.Decimal(10, 2)
+  image       String      @db.VarChar(255)
+  CartItem    CartItem[]
+  OrderItem   OrderItem[]
+
+  @@index([name])
+  @@index([category])
+}
+
+model CartItem {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  productId Int
+  product   Product  @relation(fields: [productId], references: [id])
+  quantity  Int      @db.Integer
+  createdAt DateTime @default(now())
+
+  @@index([userId, productId])
+}
+
+model Order {
+  id     Int         @id @default(autoincrement())
+  userId Int
+  user   User        @relation(fields: [userId], references: [id])
+  total  Decimal     @db.Decimal(10, 2)
+  date   DateTime    @default(now())
+  items  OrderItem[]
+
+  @@index([date])
+}
+
+model OrderItem {
+  id        Int     @id @default(autoincrement())
+  orderId   Int
+  order     Order   @relation(fields: [orderId], references: [id])
+  productId Int
+  product   Product @relation(fields: [productId], references: [id])
+  quantity  Int     @db.Integer
+  price     Decimal @db.Decimal(10, 2)
+}

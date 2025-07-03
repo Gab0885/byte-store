@@ -1,5 +1,6 @@
 import type { NextFunction, Request, Response } from "express";
 import { prisma } from "../config/database";
+import { findById, findByName } from "../services/productService";
 
 export const findAllProducts = async (
   _req: Request,
@@ -14,7 +15,7 @@ export const findAllProducts = async (
   }
 };
 
-export const findProductByID = async ( req: Request, res: Response, next: NextFunction) => {
+export const findProductByID = async (req: Request, res: Response, next: NextFunction) => {
   const id = +req.params.id;
   if (isNaN(id)) {
     res.status(400).json({ message: "ID Inválido." });
@@ -22,9 +23,7 @@ export const findProductByID = async ( req: Request, res: Response, next: NextFu
   }
 
   try {
-    const product = await prisma.product.findUnique({
-      where: { id },
-    });
+    const product = await findById(id)
     if (!product) {
       res.status(404).json({ message: "Produto não encontrado." });
       return;
@@ -35,3 +34,23 @@ export const findProductByID = async ( req: Request, res: Response, next: NextFu
     next(error);
   }
 };
+
+export const findProductByName = async ( req: Request, res: Response, next: NextFunction) => {
+  const { name } = req.params
+  if (!name || !String(name)) {
+    res.status(400).json("Nome inválido.")
+    return;
+  }
+
+  try {
+    const products = await findByName(name)
+    if(products.length === 0) {
+      res.status(404).json({ message: "Produto não encontrado."})
+      return
+    }
+
+    res.status(200).json(products)
+  } catch (error) {
+    next(error)
+  }
+}

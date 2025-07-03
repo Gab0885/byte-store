@@ -1,8 +1,10 @@
 import { Router } from "express";
-import { findAllProducts } from "../controllers/produtcController";
+import { findAllProducts, findProductByID} from "../controllers/ProdutcController";
 
 const router = Router();
 
-router.get("/", findAllProducts);
+router.get("/products", findAllProducts);
+
+router.get("/products/:id", findProductByID);
 
 export { router };

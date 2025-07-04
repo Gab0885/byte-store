@@ -1,6 +1,5 @@
 import type { NextFunction, Request, Response } from "express";
-import { prisma } from "../config/database";
-import { deleteById, findById, findByName } from "../services/productService";
+import { deleteById, findAll, findById, findByName } from "../services/productService";
 
 export const findAllProducts = async (
   _req: Request,
@@ -8,7 +7,7 @@ export const findAllProducts = async (
   next: NextFunction
 ) => {
   try {
-    const products = await prisma.product.findMany();
+    const products = await findAll()
     res.status(200).json(products);
   } catch (error) {
     next(error);

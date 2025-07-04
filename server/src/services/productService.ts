@@ -10,3 +10,7 @@ export async function findByName(name: string): Promise<Product[]> {
     where: { name: { contains: name, mode: "insensitive" } },
   });
 }
+
+export async function deleteById(id: number): Promise<Product | null> {
+  return await prisma.product.delete({ where: { id } });
+}

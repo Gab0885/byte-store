@@ -1,6 +1,6 @@
 import type { NextFunction, Request, Response } from "express";
 import { prisma } from "../config/database";
-import { findById, findByName } from "../services/productService";
+import { deleteById, findById, findByName } from "../services/productService";
 
 export const findAllProducts = async (
   _req: Request,
@@ -50,6 +50,25 @@ export const findProductByName = async ( req: Request, res: Response, next: Next
     }
 
     res.status(200).json(products)
+  } catch (error) {
+    next(error)
+  }
+}
+
+export const deleteProductById = async (req: Request, res: Response, next: NextFunction) => {
+  const id = +req.params.id
+  if(isNaN(id)) {
+    res.status(400).json({ meesage: "ID inválido"})
+    return
+  }
+
+  try {
+    const deletedProduct = await deleteById(id)
+    if (!deletedProduct) {
+      res.status(404).json({ message: "Produto não encontrado." })
+    }
+
+    res.status(200).json({ message: "Produto deletado com sucesso.", deletedProduct})
   } catch (error) {
     next(error)
   }

@@ -1,6 +1,6 @@
 import { prisma } from "../config/database";
 import type { Product } from "../prisma/generated/prisma";
-import type { createProductInput } from "../schemas/product";
+import type { createProductInput, updateProductInput } from "../schemas/product";
 
 export async function findAll() {
   return await prisma.product.findMany();
@@ -22,4 +22,8 @@ export async function deleteById(id: number): Promise<Product | null> {
 
 export async function createNew(product: createProductInput) {
   return await prisma.product.create({ data: product });
+}
+
+export async function updateById(product: updateProductInput, id: number) {
+  return await prisma.product.update({ where: { id }, data: product })
 }

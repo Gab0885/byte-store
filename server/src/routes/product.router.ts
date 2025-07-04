@@ -1,7 +1,7 @@
 import { Router } from "express";
-import { createProduct, deleteProductById, findAllProducts, findProductByID, findProductByName} from "../controllers/ProdutcController";
+import { createProduct, deleteProductById, findAllProducts, findProductByID, findProductByName, updateProduct} from "../controllers/ProdutcController";
 import { validateBody } from "../middlewares/valitade";
-import { createProductSchema } from "../schemas/product";
+import { createProductSchema, updateProductSchema } from "../schemas/product";
 
 const router = Router();
 
@@ -15,5 +15,6 @@ router.delete("/products/:id", deleteProductById)
 
 router.post("/products", validateBody(createProductSchema), createProduct)
 
+router.put("/products/:id", validateBody(updateProductSchema), updateProduct)
 
 export { router };

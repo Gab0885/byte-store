@@ -1,5 +1,5 @@
 import type { NextFunction, Request, Response } from "express";
-import { deleteById, findAll, findById, findByName } from "../services/productService";
+import { deleteById, findAll, findById, findByName, createNew } from "../services/productService";
 
 export const findAllProducts = async (
   _req: Request,
@@ -71,4 +71,14 @@ export const deleteProductById = async (req: Request, res: Response, next: NextF
   } catch (error) {
     next(error)
   }
+}
+
+export const createProduct = async (req: Request, res: Response, next: NextFunction) => {
+ try {
+   const newProduct = await createNew(req.body)
+   res.status(201).json({ message: "Produto criado com sucesso.", newProduct}
+   )
+ } catch (error) {
+  next(error)
+ }
 }

@@ -1,20 +1,33 @@
 import { Router } from "express";
-import { createProduct, deleteProductById, findAllProducts, findProductByID, findProductByName, updateProduct} from "../controllers/ProdutcController";
+import {
+  createProduct,
+  deleteProductById,
+  findAllProducts,
+  findProductByID,
+  findProductByName,
+  updateProduct,
+} from "../controllers/ProdutcController";
 import { validateBody } from "../middlewares/valitade";
 import { createProductSchema, updateProductSchema } from "../schemas/product";
 
 const router = Router();
 
-router.get("/products", findAllProducts);
+router
+  .route("/")
+  .get(findAllProducts)
+  .post(validateBody(createProductSchema), createProduct);
 
-router.get("/products/search/:name", findProductByName)
+router
+  .route("/")
+  .get(findAllProducts)
+  .post(validateBody(createProductSchema), createProduct);
 
-router.get("/products/:id", findProductByID);
+router.route("/search/:name").get(findProductByName);
 
-router.delete("/products/:id", deleteProductById)
+router
+  .route("/:id")
+  .get(findProductByID)
+  .put(validateBody(updateProductSchema), updateProduct)
+  .delete(deleteProductById);
 
-router.post("/products", validateBody(createProductSchema), createProduct)
-
-router.put("/products/:id", validateBody(updateProductSchema), updateProduct)
-
-export { router };
+export default router

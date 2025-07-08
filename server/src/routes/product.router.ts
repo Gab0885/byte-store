@@ -17,11 +17,6 @@ router
   .get(findAllProducts)
   .post(validateBody(createProductSchema), createProduct);
 
-router
-  .route("/")
-  .get(findAllProducts)
-  .post(validateBody(createProductSchema), createProduct);
-
 router.route("/search/:name").get(findProductByName);
 
 router

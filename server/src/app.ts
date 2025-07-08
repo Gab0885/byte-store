@@ -1,8 +1,7 @@
 import express from "express";
 import { router as healthcheck } from "./routes/test";
 import productRouter from "./routes/product.router"
-import { errorHandlerMiddleware as errorHandler } from "./middlewares/errorHandler";
-
+import  errorHandler from "./middlewares/errorHandler";
 const app = express();
 
 app.use(express.json());

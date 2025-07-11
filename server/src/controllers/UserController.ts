@@ -106,6 +106,14 @@ export const createUser = async (
   next: NextFunction
 ) => {
   try {
+
+    const userExists = await findByEmail(req.body.email)
+
+    if(userExists) {
+      res.status(400).json({ message: "Email já em uso, tente com outro email."})
+      return
+    }
+
     const newUser = await createNew(req.body);
 
     const { passwordHash, ...safeNewUser } = newUser;

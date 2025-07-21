@@ -10,8 +10,8 @@ export const getJwtSecret = (): jwt.Secret => {
   return JWT_SECRET;
 };
 
-export const generateToken = (userId: number, email: string) => {
-  return jwt.sign({ userId, email }, JWT_SECRET, {
+export const generateToken = (userId: number, name: string, email: string) => {
+  return jwt.sign({ userId, name, email }, JWT_SECRET, {
     expiresIn: '12h' // Token expira em 12 horas
   });
 };

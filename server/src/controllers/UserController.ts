@@ -1,4 +1,4 @@
-import type { NextFunction, Request, Response } from "express";
+import type { NextFunction, Request, Response, CookieOptions } from "express";
 import {
   findAll,
   findByEmail,
@@ -7,6 +7,14 @@ import {
   findById,
   updateById,
 } from "../services/userService";
+import { generateToken } from "../utils/generateToken";
+
+const cookieOptions: CookieOptions = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === "production",
+  sameSite: "strict",
+  maxAge: 1000 * 60 * 60 * 6, // 6 horas
+};
 
 export const findAllUsers = async (
   _req: Request,
@@ -106,17 +114,21 @@ export const createUser = async (
   next: NextFunction
 ) => {
   try {
+    const userExists = await findByEmail(req.body.email);
 
-    const userExists = await findByEmail(req.body.email)
-
-    if(userExists) {
-      res.status(400).json({ message: "Email já em uso, tente com outro email."})
-      return
+    if (userExists) {
+      res
+        .status(400)
+        .json({ message: "Email já em uso, tente outro email." });
+      return;
     }
 
     const newUser = await createNew(req.body);
-
     const { passwordHash, ...safeNewUser } = newUser;
+
+    const token = generateToken(safeNewUser.id, safeNewUser.name, safeNewUser.email)
+    
+    res.cookie("jwt", token, cookieOptions)
 
     res
       .status(201)

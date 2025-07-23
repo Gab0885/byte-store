@@ -1,23 +1,5 @@
 import z from "zod";
 
-export const createUserSchema = z
-  .object({
-    name: z
-      .string()
-      .trim()
-      .nonempty("O nome é obrigatório")
-      .min(2, "O nome deve ter ao menos 2 caracteres"),
-
-    email: z
-      .string()
-      .trim()
-      .nonempty("O email é obrigatório")
-      .email("Formato de email inválido"),
-
-    passwordHash: z.string().min(5, "A senha deve ter ao menos 5 caracteres"),
-  })
-  .strict();
-
 export const updateUserSchema = z
   .object({
     name: z
@@ -35,6 +17,4 @@ export const updateUserSchema = z
   })
   .strict();
 
-export type createUserInput = z.infer<typeof createUserSchema>;
-
-export type updateUserInput = z.infer<typeof updateUserSchema>;
+export type UpdateUserInput = z.infer<typeof updateUserSchema>;

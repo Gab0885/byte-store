@@ -24,7 +24,8 @@ export const authMiddleware = (
 
       res.locals.user = {
         id: decoded.userId,
-        name: decoded.name
+        name: decoded.name,
+        email: decoded.email
       };
     } catch (err) {
       console.error('Erro de autenticação:', err);

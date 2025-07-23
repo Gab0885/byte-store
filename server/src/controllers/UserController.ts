@@ -1,10 +1,10 @@
 import type { NextFunction, Request, Response } from "express";
 import {
-  findAll,
-  findByEmail,
-  deleteById,
-  findById,
-  updateById,
+  getAllUsers,
+  getUserByEmail,
+  removeUserById,
+  getUserById,
+  updateUserById,
 } from "../services/userService";
 
 export const findAllUsers = async (
@@ -13,7 +13,7 @@ export const findAllUsers = async (
   next: NextFunction
 ) => {
   try {
-    const users = await findAll();
+    const users = await getAllUsers();
 
     const safeUsers = users.map(({ passwordHash, ...safeUser }) => safeUser);
     res.status(200).json(safeUsers);
@@ -34,7 +34,7 @@ export const findUserByID = async (
   }
 
   try {
-    const user = await findById(id);
+    const user = await getUserById(id);
     if (!user) {
       res.status(404).json({ message: "Usuário não encontrado." });
       return;
@@ -59,7 +59,7 @@ export const findUserByEmail = async (
   }
 
   try {
-    const user = await findByEmail(email);
+    const user = await getUserByEmail(email);
     if (!user) {
       res.status(404).json({ message: "Usuário não encontrado." });
       return;
@@ -84,7 +84,7 @@ export const deleteUserById = async (
   }
 
   try {
-    const deletedUser = await deleteById(id);
+    const deletedUser = await removeUserById(id);
     if (!deletedUser) {
       res.status(404).json({ message: "Usuário não encontrado." });
       return;
@@ -106,7 +106,7 @@ export const updateUser = async (
 ) => {
   const id = +req.params.id;
   try {
-    const updatedUser = await updateById(id, req.body);
+    const updatedUser = await updateUserById(id, req.body);
     const { passwordHash, ...safeUpdatedUser } = updatedUser;
     res
       .status(200)

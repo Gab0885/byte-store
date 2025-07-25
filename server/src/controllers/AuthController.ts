@@ -1,6 +1,6 @@
 import type { NextFunction, Request, Response, CookieOptions } from "express";
 import { createUser, verifyUser } from "../services/authService";
-import { findByEmail } from "../services/userService";
+import { getUserByEmail } from "../services/userService";
 import { generateToken } from "../utils/generateToken";
 
 const cookieOptions: CookieOptions = {
@@ -16,7 +16,7 @@ export const registerUser = async (
   next: NextFunction
 ) => {
   try {
-    const userExists = await findByEmail(req.body.email);
+    const userExists = await getUserByEmail(req.body.email);
 
     if (userExists) {
       res.status(400).json({ message: "Email já em uso, tente outro email." });

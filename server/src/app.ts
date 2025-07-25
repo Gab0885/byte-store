@@ -1,5 +1,6 @@
 import express from "express";
 import { router as healthcheck } from "./routes/test";
+import cartRouter from "./routes/cart.router"
 import productRouter from "./routes/product.router"
 import userRouter from "./routes/user.router"
 import authRouter from "./routes/auth.router"
@@ -14,6 +15,7 @@ app.use("/healthcheck", healthcheck);
 app.use("/api/products", productRouter)
 app.use("/api/users", userRouter)
 app.use("/api/auth", authRouter)
+app.use("/api/cart", cartRouter)
 
 app.use(errorHandler)
 

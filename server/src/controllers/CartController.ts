@@ -1,5 +1,5 @@
 import type { NextFunction, Request, Response } from "express";
-import { getAllCartItems, insertItemInCart } from "../services/cartService";
+import { getAllCartItems, insertItemInCart, updateCartItemQuantity } from "../services/cartService";
 
 export const findAllCartProducts = async (
   req: Request,
@@ -36,3 +36,17 @@ export const addProductToCart = async (
     next(error);
   }
 };
+
+export const updateQuantityInCart = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { userId, productId, newQuantity } = req.body
+  try {
+    const updatedCartItem = await updateCartItemQuantity(userId, productId, newQuantity)
+    res.status(200).json({ message: "Quantidade atualizada com sucesso!", updatedCartItem})
+  } catch (error) {
+    next(error)
+  }
+}

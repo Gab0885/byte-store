@@ -21,6 +21,14 @@ export async function generateCartItem(userId: number, productId: number, quanti
   });
 }
 
+export async function updateCartItemQuantity(CartId: number, newQuantity: number) {
+  return await prisma.cartItem.update({
+    where: { id: CartId },
+    data: { quantity: newQuantity },
+    include: { product: true },
+  });
+}
+
 export async function insertItemInCart(
   userId: number,
   productId: number,
@@ -29,17 +37,8 @@ export async function insertItemInCart(
   const existingItem = await getCartItemById(userId, productId)
 
   if (existingItem) {
-    return await prisma.cartItem.update({
-      where: {
-        id: existingItem.id,
-      },
-      data: {
-        quantity: existingItem.quantity + quantity,
-      },
-      include: {
-        product: true,
-      },
-    });
+    const newQuantity = existingItem.quantity + quantity
+    return await updateCartItemQuantity(existingItem.id, newQuantity)
   }
 
   return await generateCartItem(userId, productId, quantity)

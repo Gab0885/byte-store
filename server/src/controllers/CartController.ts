@@ -1,5 +1,6 @@
 import type { NextFunction, Request, Response } from "express";
-import { getAllCartProducts, insertProductInCart } from "../services/cartService";
+import { getAllCartItems, insertItemInCart } from "../services/cartService";
+
 export const findAllCartProducts = async (
   req: Request,
   res: Response,
@@ -8,7 +9,7 @@ export const findAllCartProducts = async (
 
   const userId = +req.params.userId
   try {
-    const products = await getAllCartProducts(userId)
+    const products = await getAllCartItems(userId)
 
     if (products.length === 0) {
       res.status(200).json({ message: "Seu carrinho está vazio."})
@@ -27,10 +28,10 @@ export const addProductToCart = async (
 ) => {
   const { userId, productId, quantity} = req.body
   try {
-    const newProduct = await insertProductInCart(userId, productId, quantity);
+    const cartItem = await insertItemInCart(userId, productId, quantity);
     res
       .status(201)
-      .json({ message: "Produto adicionado ao carrinho com sucesso!", newProduct });
+      .json({ message: "Produto adicionado ao carrinho com sucesso!", cartItem });
   } catch (error) {
     next(error);
   }

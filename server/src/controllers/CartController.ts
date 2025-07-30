@@ -28,10 +28,14 @@ export const addProductToCart = async (
 ) => {
   const { userId, productId, quantity} = req.body
   try {
-    const cartItem = await insertItemInCart(userId, productId, quantity);
+    const result = await insertItemInCart(userId, productId, quantity);
+    if (!result.success) {
+      res.status(400).json({ message: result.message || "Erro ao adicionar produto ao carrinho."})
+    }
+
     res
       .status(201)
-      .json({ message: "Produto adicionado ao carrinho com sucesso!", cartItem });
+      .json({ message: "Produto adicionado ao carrinho com sucesso!", data: result.data });
   } catch (error) {
     next(error);
   }
@@ -44,8 +48,13 @@ export const updateQuantityInCart = async (
 ) => {
   const { userId, productId, newQuantity } = req.body
   try {
-    const updatedCartItem = await updateCartItemQuantity(userId, productId, newQuantity)
-    res.status(200).json({ message: "Quantidade atualizada com sucesso!", updatedCartItem})
+    const result= await updateCartItemQuantity(userId, productId, newQuantity)
+
+    if(!result.success) {
+      res.status(404).json({ message: result.message})
+    }
+
+    res.status(200).json({ message: "Quantidade atualizada com sucesso!", data: result.data})
   } catch (error) {
     next(error)
   }

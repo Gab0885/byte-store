@@ -1,18 +1,23 @@
 import { prisma } from "../config/database";
-import { AppError } from "../erros/appError";
 import type { CartItem } from "../prisma/generated/prisma";
 
-export async function getCartItemById(userId: number, productId: number) {
-  return await prisma.cartItem.findFirst({
-    where: { userId, productId },
-  });
-}
+type ServiceResponse<T> = {
+  success: boolean;
+  data?: T;
+  message?: string;
+};
+
+const CART_ITEM_NOT_FOUND = "Item do carrinho não encontrado.";
 
 export async function getAllCartItems(id: number): Promise<CartItem[]> {
   return await prisma.cartItem.findMany({
     where: { userId: id },
     include: { product: true },
   });
+}
+
+async function findCartItem(userId: number, productId: number) {
+  return prisma.cartItem.findFirst({ where: { userId, productId } });
 }
 
 export async function generateCartItem(
@@ -26,34 +31,65 @@ export async function generateCartItem(
   });
 }
 
+async function updateItemQuantityById(id: number, quantity: number) {
+  return prisma.cartItem.update({
+    where: { id },
+    data: { quantity },
+    include: { product: true },
+  });
+}
+
+export async function getCartItemById(
+  userId: number,
+  productId: number
+): Promise<ServiceResponse<CartItem>> {
+  const item = await findCartItem(userId, productId);
+  if (!item) return { success: false, message: CART_ITEM_NOT_FOUND };
+
+  return { success: true, data: item };
+}
+
 export async function updateCartItemQuantity(
   userId: number,
   productId: number,
   newQuantity: number
-) {
-  const cartItem = await getCartItemById(userId, productId);
-  if (!cartItem) {
-    throw new AppError("Item do carrinho não encontrado.", 404);
-  }
+): Promise<ServiceResponse<CartItem>> {
+  const existingItem = await findCartItem(userId, productId);
+  if (!existingItem) return { success: false, message: CART_ITEM_NOT_FOUND };
 
-  return await prisma.cartItem.update({
-    where: { id: cartItem.id },
-    data: { quantity: newQuantity },
-    include: { product: true },
-  });
+  const updatedItem = await updateItemQuantityById(
+    existingItem.id,
+    newQuantity
+  );
+  return { success: true, data: updatedItem };
 }
 
 export async function insertItemInCart(
   userId: number,
   productId: number,
   quantity: number = 1
-): Promise<CartItem> {
-  const existingItem = await getCartItemById(userId, productId);
-
+): Promise<ServiceResponse<CartItem>> {
+  const existingItem = await findCartItem(userId, productId);
   if (existingItem) {
     const newQuantity = existingItem.quantity + quantity;
-    return await updateCartItemQuantity(userId, productId, newQuantity);
+    const updatedItem = await updateItemQuantityById(
+      existingItem.id,
+      newQuantity
+    );
+    return { success: true, data: updatedItem };
   }
 
-  return await generateCartItem(userId, productId, quantity);
+  const newItem = await generateCartItem(userId, productId, quantity);
+  return { success: true, data: newItem };
+}
+
+export async function removeCartItemById(
+  userId: number,
+  productId: number
+): Promise<ServiceResponse<null>> {
+  const existingItem = await findCartItem(userId, productId);
+  if (!existingItem) return { success: false, message: CART_ITEM_NOT_FOUND };
+
+  await prisma.cartItem.delete({ where: { id: existingItem.id } });
+  return { success: true };
 }
